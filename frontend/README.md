@@ -74,3 +74,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 - Set a monthly spending budget.
 - Track total expenses and remaining budget.
 - Prevent expenses from exceeding the budget.
+
+## Expense Entry Feature
+
+- Add expenses with a title and amount.
+- Categorize expenses as Food, Academic, Travel, or Other.
+- View, edit, and delete recorded expenses.
