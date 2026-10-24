@@ -72,9 +72,13 @@ function App() {
             ? customCategory.trim()
             : category;
 
-        if (!title.trim() || !amount.trim() ||
-            !Number.isFinite(value) || value <= 0 ||
-            !selectedCategory) {
+        if (
+            !title.trim() ||
+            !amount.trim() ||
+            !Number.isFinite(value) ||
+            value <= 0 ||
+            !selectedCategory
+        ) {
             setError("Enter a valid name, amount and category.");
             return;
         }
@@ -82,6 +86,13 @@ function App() {
         setLoading(true);
 
         try {
+            const oldExpense = expenses.find(
+                expense => expense._id === editId
+            );
+
+            const updatedTotal = total -
+                Number(oldExpense?.amount || 0) + value;
+
             const url = editId
                 ? `${API}/expenses/${editId}`
                 : `${API}/expenses`;
@@ -105,6 +116,13 @@ function App() {
             await fetchExpenses();
             resetForm();
             setMessage(editId ? "Expense updated." : "Expense added.");
+
+            if (updatedTotal > budget) {
+                alert(
+                    `Budget exceeded by ${formatMoney(updatedTotal - budget)}!`
+                );
+            }
+
             setView("expenses");
         } catch (err) {
             setError(err.message);
@@ -115,6 +133,7 @@ function App() {
 
     const startEdit = (expense) => {
         const standardCategories = ["Food", "Academic", "Travel"];
+
         setTitle(expense.title);
         setAmount(String(expense.amount));
         setCategory(
@@ -143,6 +162,7 @@ function App() {
             const response = await fetch(`${API}/expenses/${id}`, {
                 method: "DELETE"
             });
+
             const data = await response.json();
 
             if (!response.ok) {
@@ -163,8 +183,11 @@ function App() {
 
         const value = Number(budgetInput);
 
-        if (!budgetInput.trim() ||
-            !Number.isFinite(value) || value <= 0) {
+        if (
+            !budgetInput.trim() ||
+            !Number.isFinite(value) ||
+            value <= 0
+        ) {
             setError("Enter a valid spending limit.");
             return;
         }
@@ -184,6 +207,12 @@ function App() {
 
             setBudget(data.limit);
             setMessage("Spending limit saved.");
+
+            if (total > data.limit) {
+                alert(
+                    `Your current spending is ${formatMoney(total - data.limit)} over the new budget.`
+                );
+            }
         } catch (err) {
             setError(err.message);
         }
@@ -247,9 +276,9 @@ function App() {
                         <p className="eyebrow">YOUR MONEY, YOUR CONTROL</p>
                         <h1>
                             {view === "dashboard" ? "Dashboard" :
-                             view === "add" ? (editId ? "Edit Expense" : "Add Expense") :
-                             view === "expenses" ? "All Expenses" :
-                             "Spending Limit"}
+                                view === "add" ? (editId ? "Edit Expense" : "Add Expense") :
+                                    view === "expenses" ? "All Expenses" :
+                                        "Spending Limit"}
                         </h1>
                     </div>
                     <div className="profile-badge">S</div>
@@ -328,7 +357,10 @@ function App() {
                                 <h2>Recent expenses</h2>
                                 <p>Your latest recorded spending</p>
                             </div>
-                            <button className="text-button" onClick={() => setView("expenses")}>
+                            <button
+                                className="text-button"
+                                onClick={() => setView("expenses")}
+                            >
                                 View all →
                             </button>
                         </div>
@@ -341,11 +373,13 @@ function App() {
                             onDelete={deleteExpense}
                         />
 
-                        <button className="primary-button dashboard-add"
+                        <button
+                            className="primary-button dashboard-add"
                             onClick={() => {
                                 resetForm();
                                 setView("add");
-                            }}>
+                            }}
+                        >
                             + Add new expense
                         </button>
                     </>
@@ -428,14 +462,21 @@ function App() {
                             )}
 
                             <div className="form-actions">
-                                <button type="submit" className="primary-button"
-                                    disabled={loading}>
+                                <button
+                                    type="submit"
+                                    className="primary-button"
+                                    disabled={loading}
+                                >
                                     {loading ? "Saving..." :
                                         editId ? "Update expense →" : "Save expense →"}
                                 </button>
+
                                 {editId && (
-                                    <button type="button" className="secondary-button"
-                                        onClick={resetForm}>
+                                    <button
+                                        type="button"
+                                        className="secondary-button"
+                                        onClick={resetForm}
+                                    >
                                         Cancel
                                     </button>
                                 )}
@@ -468,13 +509,16 @@ function App() {
                                     required
                                 />
                             </div>
+
                             <div className="budget-tip">
                                 <strong>💡 Your budget, your rules</strong>
                                 <p>
-                                    New expenses and expense updates that exceed this
-                                    limit will be rejected by the server.
+                                    Record every expense, even when you exceed your
+                                    budget. A warning will appear when spending goes
+                                    over your limit.
                                 </p>
                             </div>
+
                             <button className="primary-button" type="submit">
                                 Save spending limit →
                             </button>
@@ -489,14 +533,17 @@ function App() {
                                 <h2>All expenses</h2>
                                 <p>{expenses.length} recorded transactions</p>
                             </div>
-                            <button className="primary-button"
+                            <button
+                                className="primary-button"
                                 onClick={() => {
                                     resetForm();
                                     setView("add");
-                                }}>
+                                }}
+                            >
                                 + Add expense
                             </button>
                         </div>
+
                         <ExpenseList
                             expenses={[...expenses].reverse()}
                             formatMoney={formatMoney}
