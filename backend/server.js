@@ -144,13 +144,6 @@ app.post("/expenses", async (req, res) => {
             }
         ]);
 
-        const spent = result.length ? result[0].total : 0;
-
-        if (spent + amount > limit) {
-            return res.status(400).json({
-                message: "Spending limit exceeded. Expense was not added."
-            });
-        }
 
         const expense = await Expense.create({
             title: title.trim(),
@@ -205,13 +198,6 @@ app.put("/expenses/:id", async (req, res) => {
         ]);
 
         const spent = result.length ? result[0].total : 0;
-        const projectedTotal = spent - existing.amount + amount;
-
-        if (projectedTotal > limit) {
-            return res.status(400).json({
-                message: "Spending limit exceeded. Expense was not updated."
-            });
-        }
 
         existing.title = title.trim();
         existing.amount = amount;
