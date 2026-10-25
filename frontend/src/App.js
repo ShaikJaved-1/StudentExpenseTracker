@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 
-const API = "http://localhost:5000";
+const API = "https://student-expense-tracker-api-hn3q.onrender.com";
 
 function App() {
     const [expenses, setExpenses] = useState([]);
