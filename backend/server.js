@@ -1,4 +1,6 @@
 
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -10,9 +12,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb://127.0.0.1:27017/studentExpenseDB")
+
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log("MongoDB Connected Successfully"))
     .catch(error => console.log("MongoDB Connection Error:", error));
+
 
 app.get("/", (req, res) => {
     res.send("Student Expense Tracker Server is Running");
